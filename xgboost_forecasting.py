@@ -48,7 +48,13 @@ totals_df.head()
 # check description
 totals_df['Sold Units'].describe()
 # plot
-totals_df.plot(marker='o', linestyle='none')
+totals_df.set_index('Date')['Sold Units'].plot(marker = 'o',
+                                              linestyle='none')
+plt.title('Daily Total Sales Raw Data', fontweight = 'bold')
+plt.savefig('raw_data_scatterplot.png')
+# interesting separation of points seems like there are 3 different trends
+# will investigate further after adding variables for weekday/weekends and 
+# so on
 
 '''
 Feature Engineering
@@ -79,19 +85,43 @@ totals_df.head(10)
 '''
 EDA
 '''
+# helper function for plotting and saving
+def title_save(t):
+    plt.title(t,fontweight='bold')
+    plt.savefig(t.replace(' ','_') + '.png')
+    return None
+
 # check correlation matrix
 totals_df.corr()
 
+# plot with different colors for weekday and weekend
+plt.close()
+sns.scatterplot(data=totals_df,x ='Date', y = 'Sold Units', hue = 'is_weekend')
+title_save('Raw Data Separated By Weekend')
+
+
 # distribution of sold units
+plt.close()
 sns.histplot(data = totals_df['Sold Units'])
+title_save('Sold Units Histogram All Dates')
+
 # trimodal mess...
 # look at it without holidays
+plt.close()
 sns.histplot(data = totals_df[totals_df.is_holiday == 0]['Sold Units'])
+title_save('Sold Units Histogram No Holidays')
 # same...
+
 # truncate date range to everything from 2016 on like author
 totals_df = totals_df[totals_df.Date > dt.datetime(2015,12,31).date()]
+plt.close()
 sns.histplot(data = totals_df[totals_df.is_holiday == 0]['Sold Units'])
+title_save('Sold Units Histogram Since 2016')
+
+plt.close()
 sns.boxplot(totals_df['Sold Units'])
+title_save('Sold Units Boxplot Since 2016')
+plt.close()
 # much better...
 
 # top and tail sales at 5 and 95 qunatiles
@@ -145,12 +175,16 @@ print(model)
 Evaluate Model
 '''
 y_pred = model.predict(X_test)
-print(f'R2 Score on Test: {r2_score(y_test,y_pred)}')
-print(f'MAE Score on Test: {mean_absolute_error(y_test,y_pred)}')
-print(f'RMSE Score on Test: {np.sqrt(mean_squared_error(y_test,y_pred))}')
+r2 = r2_score(y_test,y_pred)
+mae = mean_absolute_error(y_test,y_pred)
+rsme = np.sqrt(mean_squared_error(y_test,y_pred))
+print(f'R2 Score on Test: {r2}')
+print(f'MAE Score on Test: {mae}')
+print(f'RMSE Score on Test: {rsme}')
 
 # examine feature importance
 xgb.plot_importance(model)
+title_save('XGBoost Model Feature Importance')
 
 # plot prediction
 df_test['prediction'] = y_pred 
@@ -158,16 +192,20 @@ df_results = pd.concat([df_test, df_train], sort=False)
 df_results.columns
 df_results.set_index('Date',drop=True,inplace=True)
 
-
+plt.close()
 df_results[['Sold Units','prediction']].plot()
 
 # check prediction closer
+plt.close()
 f,ax = plt.subplots(1)
 ax.set_title('Prediciton Results')
 _=df_results[['Sold Units','prediction']].plot(
     style=['-','o'], ax = ax)
 ax.set_xbound(lower='2019-09-01', upper='2019-10-01')
-
+ax.text('2019-09-02',2500,f'R2 Score on Test: {r2:0.2f}')
+ax.text('2019-09-02',2250,f'MAE Score on Test: {mae:0.1f}')
+ax.text('2019-09-02',2000,f'RMSE Score on Test: {rsme:0.1f}')
+title_save('Prediction Results Close Up')
 '''
 Save model
 '''
