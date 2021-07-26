@@ -25,5 +25,5 @@ An XGBoost regressor was selected for the model and optimized via gridsearch wit
 |subsample|1.0|
 
 ## Results
-The feature importances where as follows and as mentioned and shown above the overall the forecasting produced very good results with an R<sup>2</sup> of 0.87.
+The feature importances where as follows and as mentioned and shown above the overall the forecasting produced very good results with an R<sup>2</sup> of 0.87. The holidays interestingly didn't play a very large role in the model as I might have expected. The seasonality associated with the day of the month, month and day of the week dominated the model.
 ![](https://github.com/jgalloway42/xgboost_sales_forecast/blob/main/XGBoost_Model_Feature_Importance.png)
