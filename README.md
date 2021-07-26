@@ -7,4 +7,4 @@ The project comprises data formating, feature engineering, EDA and optimization 
 
 ![](../XGBoost_Model_Feature_Importance.png)
 
-![](../Prediction_Results_Close_Up.png)
+![](https://github.com/jgalloway42/xgboost_sales_forecast/blob/main/Prediction_Results_Close_Up.png)
